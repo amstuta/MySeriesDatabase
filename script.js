@@ -38,16 +38,11 @@ function handlerSearch() {
     console.log(this.responseText);
     if (this.responseText != null && this.status == 200) {
 	var res = JSON.parse(this.responseText);
-	var elem = document.createElement('h3');
-	elem.innerHTML = "Serie added";
-	document.body.appendChild(elem);
 	localStorage[res['name']] = null;
 	getInfos(res);
     }
     else {
-	var elem = document.createElement('h3');
-	elem.innerHTML = "Serie not found";
-	document.body.appendChild(elem);
+	alert("Serie not found");
     }
 }
 
@@ -62,8 +57,6 @@ function addSerie() {
 	client.send();
     }
     catch (e) {
-	var elem = document.createElement('h3');
-	elem.innerHTML = "Request error";
-	document.body.appendChild(elem);
+	alert("Request error");
     }
 }

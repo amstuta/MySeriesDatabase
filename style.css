@@ -1,4 +1,22 @@
 body {
-    width:300px;
-    height:250px;
+    width:350px;
+}
+
+header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+}
+
+section {
+    line-height:30px;
+    background-color:#eeeeee;
+    float:center;
+    padding:5px;
+}
+
+footer {
+    float:left;
+    padding:10px;
 }

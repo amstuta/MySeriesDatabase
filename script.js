@@ -67,3 +67,61 @@ function addSerie() {
 	alert("Request error");
     }
 }
+
+
+function load() {
+    try {
+	var oP = document.body.getElementsByTagName('section')[0];
+	document.body.removeChild(oP);
+    }
+    catch (e) {
+    }
+
+    var section = document.createElement('section');
+    var title = document.createElement('h2');
+
+    title.innerHTML = "Series";
+    section.appendChild(title);
+    for (var key in localStorage) {
+
+	var label = document.createElement('label');
+	var elem = document.createElement('input');
+
+	label.innerHTML = key;
+	elem.type = "checkbox";
+	elem.value = key;
+	elem.name = "cbox";
+	elem.innerHTML = key;
+	
+	section.appendChild(elem);
+	section.appendChild(label);
+	section.appendChild(document.createElement('br'));
+    }
+
+    var button = document.createElement('input');
+    button.type = "button";
+    button.value = "Remove";
+    button.id = "btn_remove";
+    section.appendChild(button);
+    
+    document.body.insertBefore(section, document.body.childNodes[5]);
+}
+
+
+function removeSeries() {
+    var inputElements = document.getElementsByName('cbox');
+    
+    for (var i=0; inputElements[i]; ++i) {
+	if (inputElements[i].checked) {
+	    delete localStorage[inputElements[i].value];
+	}
+    }
+    load();
+}
+
+
+window.onload = function() {
+    document.getElementById('btn').addEventListener('click', addSerie);
+    load();
+    document.getElementById('btn_remove').addEventListener('click', removeSeries);
+}

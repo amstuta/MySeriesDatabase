@@ -1,58 +1,37 @@
+var g_curName = null;
+
+
 function handlerLink() {
     if (this.responseText != null) {
 	var res = JSON.parse(this.responseText);
-
-	document.write("Airdate: ");
-	document.write(res["airdate"] + " : " + res["airtime"]);
+	localStorage[g_curName] = res['airdate'] + ' - ' + res["airtime"];
+	load();
     }
 }
 
+
 function getInfos(response) {
     if (response['status'] == 'Ended') {
-	document.write("This serie is ended");
+	localStorage[response['name']] = 'Ended';
+	load();
 	return;
     }
-
     if (response.hasOwnProperty('_links')
 	&& response['_links'].hasOwnProperty('nextepisode')) {
 	
 	var link = response['_links']['nextepisode']['href'];
 	var client = new XMLHttpRequest();
+	g_curName = response['name'];
 
 	client.onload = handlerLink;
 	client.open("GET", link);
 	client.send();
     }
     else {
-	document.write("No upcoming episodes");
+	localStorage[response['name']] = 'No upcoming episodes';
     }
+    load();
 }
-
-function handlerId() {
-    if (this.responseText != null) {
-	var res = JSON.parse(this.responseText);
-	getInfos(res);
-    }
-    else {
-	document.write("Title not found");
-    }
-}
-
-function getId(title) {
-
-    var client = new XMLHttpRequest();
-    
-    client.onload = handlerId;
-    client.open("GET", "http://api.tvmaze.com/singlesearch/shows?q=" + title.replace(" ", "+"));
-    client.send();
-}
-
-function srch() {
-    var title = document.getElementById('title').value;
-    getId(title);
-}
-
-
 
 
 function handlerSearch() {
@@ -62,8 +41,8 @@ function handlerSearch() {
 	var elem = document.createElement('h3');
 	elem.innerHTML = "Serie added";
 	document.body.appendChild(elem);
-
-	localStorage[res['name']] = res['url'];
+	localStorage[res['name']] = null;
+	getInfos(res);
     }
     else {
 	var elem = document.createElement('h3');
@@ -71,6 +50,7 @@ function handlerSearch() {
 	document.body.appendChild(elem);
     }
 }
+
 
 function addSerie() {
     var title = document.getElementById('title').value;
@@ -87,7 +67,3 @@ function addSerie() {
 	document.body.appendChild(elem);
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('btn').addEventListener('click', addSerie);
-});

@@ -1,59 +1,93 @@
-function search() {
-    alert("encule");
+function handlerLink() {
+    if (this.responseText != null) {
+	var res = JSON.parse(this.responseText);
 
-    var title = document.getElementById('title').value;
-    var search = "http://www.omdbapi.com/?t=" + title.replace(" ", "+") + "&y=&plot=full&r=json";
-    var result = JSON.parse($.getJSON(search));
-
-    alert(result);
-
-    document.getElementById('title').value = result;
-    console.log(result);
+	document.write("Airdate: ");
+	document.write(res["airdate"] + " : " + res["airtime"]);
+    }
 }
 
-var HttpClient = function() {
-    this.get = function(aUrl, aCallback) {
-        var anHttpRequest = new XMLHttpRequest();
-        anHttpRequest.onreadystatechange = function() { 
-            if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
-                aCallback(anHttpRequest.responseText);
-        }
-
-        anHttpRequest.open( "GET", aUrl, true );            
-        anHttpRequest.send( null );
+function getInfos(response) {
+    if (response['status'] == 'Ended') {
+	document.write("This serie is ended");
+	return;
     }
-};
+
+    if (response.hasOwnProperty('_links')
+	&& response['_links'].hasOwnProperty('nextepisode')) {
+	
+	var link = response['_links']['nextepisode']['href'];
+	var client = new XMLHttpRequest();
+
+	client.onload = handlerLink;
+	client.open("GET", link);
+	client.send();
+    }
+    else {
+	document.write("No upcoming episodes");
+    }
+}
+
+function handlerId() {
+    if (this.responseText != null) {
+	var res = JSON.parse(this.responseText);
+	getInfos(res);
+    }
+    else {
+	document.write("Title not found");
+    }
+}
+
+function getId(title) {
+
+    var client = new XMLHttpRequest();
+    
+    client.onload = handlerId;
+    client.open("GET", "http://api.tvmaze.com/singlesearch/shows?q=" + title.replace(" ", "+"));
+    client.send();
+}
 
 function srch() {
-    var tmp = new HttpClient();
     var title = document.getElementById('title').value;
-    //var url = "http://www.omdbapi.com/?t=" + title.replace(" ", "+") + "&yplot=full&r=json";
-    //var url = "http://api.tvmaze.com/singlesearch/shows?q=" + title.replace(" ", "+") + "&embed=episodes";
-    var url = "http://api.tvmaze.com/schedule/full";
-
-    tmp.get(url, function (result) {
-	    //alert(JSON.parse(result)['Title']);
-	    res = JSON.parse(result);
-	    
-	    for (var key in res)
-		{
-		    /*
-		    document.write(key + '\n');
-		    document.write(res[key] + '\n');
-		    */
-		    //document.write(res['schedule'][key] + '\n');
-
-		    console.log(res[key]);
-		}
-	    });
+    getId(title);
 }
 
-document.getElementById('btn').onclick = srch;
-/*
-document.getElementById('btn').onclick = {
-    var tmp = new HttpClient();
-    tmp.get("http://www.omdbapi.com/?t=walking+dead&y=&plot=full&r=json", function (response) {
-	    alert(JSON.parse(response));
-	});
-};
-*/
+
+
+
+function handlerSearch() {
+    console.log(this.responseText);
+    if (this.responseText != null && this.status == 200) {
+	var res = JSON.parse(this.responseText);
+	var elem = document.createElement('h3');
+	elem.innerHTML = "Serie added";
+	document.body.appendChild(elem);
+
+	localStorage[res['name']] = res['url'];
+    }
+    else {
+	var elem = document.createElement('h3');
+	elem.innerHTML = "Serie not found";
+	document.body.appendChild(elem);
+    }
+}
+
+function addSerie() {
+    var title = document.getElementById('title').value;
+    var client = new XMLHttpRequest();
+
+    try {
+	client.onload = handlerSearch;
+	client.open("GET", "http://api.tvmaze.com/singlesearch/shows?q=" + title.replace(" ", "+"));
+	client.send();
+    }
+    catch (e) {
+	var elem = document.createElement('h3');
+	elem.innerHTML = "Request error";
+	document.body.appendChild(elem);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('btn').addEventListener('click', addSerie);
+});

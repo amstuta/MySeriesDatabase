@@ -4,7 +4,14 @@ var g_curName = null;
 function handlerLink() {
     if (this.responseText != null) {
 	var res = JSON.parse(this.responseText);
-	localStorage[g_curName] = res['airdate'] + ' - ' + res["airtime"];
+	var options = {
+	    weekday: "long",
+	    month: "short",
+	    day: "numeric"
+	};
+
+	var date = new Date(res['airdate']);
+	localStorage[g_curName] = date.toLocaleDateString("en-US", options) + ' - ' + res["airtime"];
 	load();
     }
 }

@@ -12,7 +12,9 @@ function handlerLink() {
 
 	var date = new Date(res['airdate']);
 	localStorage[g_curName] = date.toLocaleDateString("en-US", options) + ' - ' + res["airtime"];
-	location.reload();
+	localStorage[g_curName + '_date'] = date;
+	//location.reload();
+	load();
     }
 }
 
@@ -20,7 +22,9 @@ function handlerLink() {
 function getInfos(response) {
     if (response['status'] == 'Ended') {
 	localStorage[response['name']] = 'Ended';
-	location.reload();
+	localStorage[response['name'] + '_date'] = null;
+	//location.reload();
+	load();
 	return;
     }
     if (response.hasOwnProperty('_links')
@@ -36,8 +40,10 @@ function getInfos(response) {
     }
     else {
 	localStorage[response['name']] = 'No upcoming episodes';
+	localStorage[response['name'] + '_date'] = null;
     }
-    location.reload();
+    //location.reload();
+    load();
 }
 
 
@@ -69,28 +75,41 @@ function addSerie() {
 
 
 function load() {
+
+    /*
     try {
 	var oP = document.body.getElementsByTagName('section')[0];
 	document.body.removeChild(oP);
     }
     catch (e) {
-    }
+    }*/
 
-    var section = document.createElement('section');
+    //var section = document.createElement('section');
+    var section = document.getElementsByTagName('section')[0];
     var title = document.createElement('h2');
 
+    while (section.firstChild) {
+	section.removeChild(section.firstChild);
+    }
     title.innerHTML = "Series";
     section.appendChild(title);
+    
     for (var key in localStorage) {
+
+	if (key.endsWith("_date")) {
+	    continue;
+	}
 
 	var label = document.createElement('label');
 	var elem = document.createElement('input');
 
 	label.innerHTML = key;
+	//label.id = key.replace(new RegExp(' ', 'g'), '_') + "_label";
 	elem.type = "checkbox";
-	elem.value = key;
+	elem.value = key; //key.replace(new RegExp(' ', 'g'), '_');
 	elem.name = "cbox";
 	elem.innerHTML = key;
+	//elem.id = key.replace(new RegExp(' ', 'g'), '_');
 	
 	section.appendChild(elem);
 	section.appendChild(label);
@@ -103,7 +122,9 @@ function load() {
     button.id = "btn_remove";
     section.appendChild(button);
     
+    /*
     document.body.insertBefore(section, document.body.childNodes[4]);
+    */
 }
 
 
@@ -112,10 +133,15 @@ function removeSeries() {
     
     for (var i=0; inputElements[i]; ++i) {
 	if (inputElements[i].checked) {
+	    //console.log(inputElements[i].value);
+	    //document.getElementById(inputElements[i].value).remove();
+	    //document.getElementById(inputElements[i].value + "_label").remove();
 	    delete localStorage[inputElements[i].value];
+	    delete localStorage[inputElements[i].value + "_date"];
 	}
     }
-    location.reload();
+    //location.reload();
+    load();
 }
 
 

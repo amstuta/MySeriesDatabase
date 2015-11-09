@@ -12,7 +12,7 @@ function handlerLink() {
 
 	var date = new Date(res['airdate']);
 	localStorage[g_curName] = date.toLocaleDateString("en-US", options) + ' - ' + res["airtime"];
-	load();
+	location.reload();
     }
 }
 
@@ -20,7 +20,7 @@ function handlerLink() {
 function getInfos(response) {
     if (response['status'] == 'Ended') {
 	localStorage[response['name']] = 'Ended';
-	load();
+	location.reload();
 	return;
     }
     if (response.hasOwnProperty('_links')
@@ -37,12 +37,11 @@ function getInfos(response) {
     else {
 	localStorage[response['name']] = 'No upcoming episodes';
     }
-    load();
+    location.reload();
 }
 
 
 function handlerSearch() {
-    console.log(this.responseText);
     if (this.responseText != null && this.status == 200) {
 	var res = JSON.parse(this.responseText);
 	localStorage[res['name']] = null;
@@ -104,7 +103,7 @@ function load() {
     button.id = "btn_remove";
     section.appendChild(button);
     
-    document.body.insertBefore(section, document.body.childNodes[5]);
+    document.body.insertBefore(section, document.body.childNodes[4]);
 }
 
 
@@ -116,7 +115,7 @@ function removeSeries() {
 	    delete localStorage[inputElements[i].value];
 	}
     }
-    load();
+    location.reload();
 }
 
 

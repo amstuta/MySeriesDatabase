@@ -100,7 +100,7 @@ function load() {
 	    update(key);
 	}
 	else {
-	    var airDate = localStorage[key + '_date'];
+	    var airDate = new Date(localStorage[key + '_date']);
 	    var today = new Date();
 
 	    if (today > airDate) {
